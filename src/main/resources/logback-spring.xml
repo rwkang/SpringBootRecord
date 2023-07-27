@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 2023.07.11 Conclusion. 여기 파일은, sql.xml 파일에서, SELECT 구문의 LOG.로그를 자동으로 찍어주어,
+    어떤 SQL 구문에 의한 것인지를 찍어주게 하는 내용을 정의하는 파일이다.
+    https://www.youtube.com/watch?v=plGXzt8MmjU&list=PL3036mp45iYyP_Dqz7cHuDN6DQcUiKdlM&index=13
+-->
+
+<!--<configuration xmlns="$LOCAL_SCHEMA$" version="" name="">-->
+<configuration>
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <Pattern>[%d{yyyy-MM-dd HH:mm:ss}:%-3relative] [%thread] %-5level %logger{36} - %msg%n</Pattern>
+        </encoder>
+    </appender>
+
+    <!--    Logback은 5단계의 로그 레벨을 가진다.-->
+    <!--    심각도 수준은 off > Error > Warn > Info > Debug > Trace 이다.-->
+
+    <logger name="com.springboot.record" level="Debug"/>
+    <root level="Info">
+        <appender-ref ref="console"/>
+    </root>
+
+</configuration>
+

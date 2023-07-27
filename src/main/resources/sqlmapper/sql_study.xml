@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.springboot.record.dao.DaoStudy">
+
+<!--    <select id="doDaoStudy" resultType="map"> 2023.07.08 Conclusion. doDaoStudy.List<Map<String, String>> 여기에, 아래 "Data"를 넣겠다는 의미-->
+    <select id="doDaoStudy" resultType="map">
+        SELECT TO_CHAR(key_id) AS key_id, study_day, contents, TO_CHAR(reg_day, 'YYYY-MM-DD HH24:MI:SS') AS reg_day FROM study_record
+    </select>
+
+<!--    <select id="doDaoListMapStudy" resultType="list"> 2023.07.08 안 됨-->
+<!--    <select id="doDaoListMapStudy" resultType="string"> 2023.07.08 안 됨-->
+    <select id="doDaoListStudy" resultType="map">
+        SELECT CONTENTS FROM STUDY_RECORD
+    </select>
+
+
+<!-- mapper 방법 1. -->
+<!--    <select id="doDaoStudyVo" resultType="com.springboot.record.vo.VoStudy"> 2023.07.08 Conclusion. VoStudy.class 파일에, 아래 "Data"를 넣겠다라는 의미-->
+<!--    2023.07.11 Conclusion. 아래 resultMat 태그를 사용할 때는, 아래 select 태그는 주석 처리해야 한다. ∴ select 태그 id가 동일하기 때문이다.-->
+<!--    <select id="doDaoStudyVo" resultType="com.springboot.record.vo.VoStudy" resultMap="mapDaoStudyVo">-->
+<!--        SELECT TO_CHAR(KEY_ID) AS KEY_ID, STUDY_DAY, CONTENTS, TO_CHAR(REG_DAY, 'YYYY-MM-DD HH24:MI:SS') AS REG_DAY FROM STUDY_RECORD-->
+<!--    </select>-->
+
+<!-- mapper 방법 2. resultMap 태그 사용 -->
+<!-- 2023.07.11 Conclusion. MyBatis: www.mybatis.org/mybatis-3/LM: Configuration XML/TS: resultmap 검색.
+    resultMap 태그를 사용하여, SELECT 문 [ALIAS] 이름을 반드시 [컬럼명]과 동일하게 처리할 수 없는 상황에 대비할 수 있다  -->
+<!--    <resultMap id="mapDaoStudyVo"[=> 아래 select 태그의 resultMap="여기 인자로 보내지고..."]
+                   type="com.springboot.record.vo.VoStudy"[=> 아래 select 태그의 resultType="여기에서 온 인자 임"] >-->
+
+<!-- 용법은, <result column="key_id"[=> SELECT 문 alias 이름] property="key_id"[=> VoStudy.java.변수명] jdbcType="NVARCHAR" javaType="String"></result> -->
+<!-- 또한 resultMap 태그 사용 방법에서는, select 태그의  SELECT 문에서는 컬럼명 또는 alias 이름을 [대문자] or [소문자] 모두 사용해도 전혀 무방하다.
+        SELECT TO_CHAR(KEY_ID) AS KEY_ID, STUDY_DAY, CONTENTS, TO_CHAR(REG_DAY, 'YYYY-MM-DD HH24:MI:SS') AS REG_DAY FROM STUDY_RECORD
+        SELECT TO_CHAR(key_id) AS key_id, study_day, contents, TO_CHAR(reg_day, 'YYYY-MM-DD HH24:MI:SS') AS reg_day FROM STUDY_RECORD
+        SELECT TO_CHAR(key_id) AS key_id2, study_day, contents, TO_CHAR(reg_day, 'YYYY-MM-DD HH24:MI:SS') AS reg_day2 FROM STUDY_RECORD => 여기도 잘 되고, 아래 문도 잘 된다.-->
+
+    <!--
+    <resultMap id="mapDaoStudyVo" type="com.springboot.record.vo.VoStudy">
+        <result column="key_id2" property="key_id" jdbcType="NVARCHAR" javaType="String"></result>
+        <result column="study_day2" property="study_day" jdbcType="NVARCHAR" javaType="String"></result>
+        <result column="contents2" property="contents" jdbcType="NVARCHAR" javaType="String"></result>
+        <result column="reg_day2" property="reg_day" jdbcType="NVARCHAR" javaType="String"></result>
+    </resultMap>
+
+    <select id="doDaoStudyVo" resultMap="mapDaoStudyVo">
+        SELECT TO_CHAR(key_id) AS key_id2, study_day as study_day2, contents as contents2, TO_CHAR(reg_day, 'YYYY-MM-DD HH24:MI:SS') AS reg_day2 FROM STUDY_RECORD
+    </select>
+    -->
+
+<!-- mapper 방안 3. Camel Case 스타일 사용 -->
+<!-- 2023.07.11 Conclusion. MyBatis Camel Case 지원: ORACLE DB 테이블 컬럼명이 "_"(언더바)로 되어 있는 것을,-->
+<!--    "자바 스타일.카멜 케이스" 형식으로 자동 변경해 준다. => sql.xml 파일 참조.-->
+    <select id="doDaoStudyListVo" resultType="com.springboot.record.vo.VoStudy">
+        SELECT TO_CHAR(key_id) AS key_id, study_day, contents, TO_CHAR(reg_day, 'YYYY-MM-DD HH24:Mi:SS') AS reg_day
+        FROM study_record
+        ORDER BY key_id DESC
+    </select>
+
+    <!-- One Row Select ***** 엄청 중요 주의: 아래 <select> 태그 안에 [주석문]이 있으면, [부적합한 열 인덱스] 에러 발생한다 *****-->
+    <!-- *** resultType="com.springboot.record.vo.VoStudy" => 생략 절대 불가 ***-->
+<!--    <select id="doDaoStudyOneVo" parameterType="String" resultType="com.springboot.record.vo.VoStudy">-->
+    <select id="doDaoStudyOneVo" resultType="com.springboot.record.vo.VoStudy">
+        SELECT TO_CHAR(key_id) AS key_id, study_day, contents, TO_CHAR(reg_day, 'YYYY-MM-DD HH24:Mi:SS') AS reg_day
+        FROM study_record
+        WHERE key_id = TO_NUMBER(#{strKeyId})
+        ORDER BY key_id DESC
+    </select>
+<!--     SELECT TO_CHAR(key_id) AS key_id, study_day, contents, TO_CHAR(reg_day, 'YYYY-MM-DD HH24:MI:SS') AS reg_day FROM study_record WHERE 1=1 AND key_id = #{strKeyId} ORDER BY key_id-->
+<!--     SELECT TO_CHAR(key_id) AS key_id, study_day, contents, TO_CHAR(reg_day, 'YYYY-MM-DD HH24:Mi:SS') AS reg_day FROM study_record WHERE key_id = #{strKeyId}-->
+
+    <!-- Update ***** 엄청 중요 주의: 아래 <update> 태그 안에 [주석문]이 있으면, [부적합한 열 인덱스] 에러 발생한다 *****-->
+    <!-- Update 할 때 parameter 값은, ***** VoStudy.java에서 private [변수명]을 그대로 사용한다 *****-->
+    <!-- *** parameterType="com.springboot.record.vo.VoStudy" => 생략 가능 ***-->
+    <!--    <update id="doDaoStudyUpdateVo" parameterType="com.springboot.record.vo.VoStudy">-->
+    <update id="doDaoStudyUpdateVo">
+        UPDATE study_record SET study_day=#{studyDay}, contents=#{contents}, reg_day=sysdate
+                            WHERE key_id = TO_NUMBER(#{keyId})
+    </update>
+
+    <!-- Delete ***** 엄청 중요 주의: 아래 <delete> 태그 안에 [주석문]이 있으면, [부적합한 열 인덱스] 에러 발생한다 *****-->
+    <!-- *** parameterType="com.springboot.record.vo.VoStudy" => 생략 가능 ***-->
+    <!--    <delete id="doDaoStudyDelete" parameterType="com.springboot.record.vo.VoStudy">-->
+    <delete id="doDaoStudyDelete">
+        DELETE FROM study_record WHERE key_id = TO_NUMBER(#{strKeyId})
+    </delete>
+
+    <!-- Insert ***** 엄청 중요 주의: 아래 <delete> 태그 안에 [주석문]이 있으면, [부적합한 열 인덱스] 에러 발생한다 *****-->
+    <!-- *** parameterType="com.springboot.record.vo.VoStudy" => 생략 가능 ***-->
+    <!--    <insert id="doDaoStudyDelete" parameterType="com.springboot.record.vo.VoStudy">-->
+    <insert id="doDaoStudyInsertVo">
+        INSERT INTO study_record (study_day, contents, reg_day) VALUES (#{studyDay}, #{contents}, sysdate)
+    </insert>
+
+</mapper>

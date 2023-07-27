@@ -1,0 +1,69 @@
+--- # Start
+# 20230.07.01 change port
+server:
+  port: 8088
+
+--- # 여기 구분자(---)가 있으면, 반드시 [spring:]부터 사용해야 한다.
+# 2023.07.03 Controller ???? Prefix, Suffix ??
+# 2023.07.03 Controller ???? Prefix, Suffix ??
+spring:
+  # 2023.07.21 Added. profiles: 배포 시 설정 이름: spring 내 설정. https://kkh0977.tistory.com/1960
+  profiles:
+    active: prod
+
+  mvc:
+    view:
+      prefix: /WEB-INF/views/
+      suffix: .jsp
+
+  # 2023.07.01 devtools
+  # 브라우저 reloading.???: .html or .jsp 파일은, Spring Boot 자동 리로딩.
+  # => 이상하네. 여기서 false로 세팅해도, true로 세팅해도, 라이브리로딩 되네.
+  devtools:
+    livereload:
+      enabled: true
+
+    # 2023.07.01 브라우저 restarting.리스타팅: .java 파일을 수정했을 때, Spring Boot는 자동으 리스타팅 하는 것으로 세팅되어 있어, 이것을 강제로 리스팅 안 하도록 설정.
+    restart:
+      enabled: false
+
+--- # 여기 구분자(---)가 있으면, 반드시 처음[spring:]부터 사용해야 한다.
+  # 2023.07.03 oracle setting.
+  # spring.datasource.driver-class-name=oracle.jdbc.OracleDriver => 9 이하 버전 사용.
+  # scott/tiger: hello world 같은 관례.
+spring:
+  datasource:
+    # Oracle DB
+#    oracle:
+    driver-class-name: oracle.jdbc.OracleDriver
+    url=jdbc: oracle:thin:@localhost:1521/xe
+    username: scott
+    password: tiger
+
+---
+# MySql DB
+#spring:
+#  datasource:
+#    #    mysql: => ***** 여기 라인이 들어 가면 절대 안 됨: 에러 발생: 들여쓰기는 상관이 없네 *****
+#    # 2023.07.21 Conclusion. 여기서 에러나면, cmd/services.msc/MySQL/RB:시작 =====> 구동시켜야 된다.
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://localhost:3306/powerppsc?serverTimezone=UTC&characterEncoding=UTF-8
+#    username: "sa"
+#    password: "*963210z" # 비밀 번호가 [특수 문자]로 시작할 때는 반드시 따옴표로 묶어줘야 한다.
+#    # 여기 따옴표도 에러 남: url: jdbc:mysql://localhost:3306/"powerppsc"?serverTimezone=UTC&characterEncoding=UTF-8
+#    # 2023.07.21 Conclusion. 여기서 에러나면, cmd/services.msc/MySQL/RB:시작 =====> 구동시켜야 된다.
+
+
+--- # 여기 구분자(---)가 있으면, 반드시 처음[mybatis:]부터 사용해야 한다.
+# 2023.07.07 MyBitis Path.패쓰 설정.
+mybatis:
+  mapper-locations:
+    classpath: sqlmapper/*.xml
+
+--- # 여기 구분자(---)가 있으면, 반드시 처음[mybatis:]부터 사용해야 한다.
+# 2023.07.11 Conclusion. MyBatis Camel Case 지원: ORACLE DB 테이블 컬럼명이 "_"(언더바)로 되어 있는 것을,
+#   "자바 스타일.카멜 케이스" 형식으로 자동 변경해 준다. => sql.xml 파일 참조.
+#   Spring.스프링에서는 디폴트 값이 "false"로 설정되어 있으므로, 여기서 "true"로 세팅해 주어야 한다.
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
